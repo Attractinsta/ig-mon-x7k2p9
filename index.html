@@ -2,7 +2,9 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
 <title>Instagram 一括モニター ×18</title>
 <style>
   :root{
@@ -15,103 +17,188 @@
   *{ box-sizing:border-box; margin:0; padding:0; }
   body{
     margin:0; background:#fafafa;
-    font-family:"Noto Sans JP",system-ui,sans-serif;
+    font-family:"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
   }
   header{
     position:sticky; top:0; z-index:2;
     background:#ffffffee; backdrop-filter:blur(6px);
     border-bottom:1px solid #ddd; 
-    padding:4px 8px;
-    display:flex; flex-wrap:wrap; align-items:center; 
-    gap:8px; justify-content:space-between;
+    padding:6px 8px;
   }
-  .title{ font-size:14px; font-weight:600; }
+  .header-main{
+    display:flex; justify-content:space-between; align-items:center;
+    margin-bottom:6px;
+  }
+  .title{ 
+    font-size:14px; font-weight:600;
+    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  }
+  .menu-toggle{
+    background:#f0f0f0; border:1px solid #ccc;
+    padding:4px 10px; border-radius:4px;
+    font-size:12px; cursor:pointer;
+  }
   .controls{ 
-    display:flex; gap:6px; flex-wrap:wrap; 
-    align-items:center; font-size:12px; 
+    display:none;
+    gap:8px; flex-wrap:wrap; 
+    align-items:center; font-size:12px;
+    padding-top:6px; border-top:1px solid #eee;
+  }
+  .controls.show{ display:flex; }
+  .control-group{
+    display:flex; align-items:center; gap:4px;
+    flex:1; min-width:140px;
+  }
+  .control-group label{
+    font-size:11px; white-space:nowrap;
   }
   select,button,input[type="range"]{
-    font:inherit; padding:3px 6px; 
+    font:inherit; padding:4px 8px; 
     border:1px solid #ccc; border-radius:4px; 
     background:#fff; font-size:11px;
+    flex:1;
   }
-  input[type="range"]{ width:80px; }
-  .hint{ font-size:10px; color:#888; margin-left:4px; }
+  input[type="range"]{ 
+    min-width:60px;
+    -webkit-appearance:none; appearance:none;
+    height:6px; background:#ddd; outline:none;
+    border-radius:3px;
+  }
+  input[type="range"]::-webkit-slider-thumb{
+    -webkit-appearance:none; appearance:none;
+    width:16px; height:16px; background:#0095f6;
+    border-radius:50%; cursor:pointer;
+  }
+  input[type="range"]::-moz-range-thumb{
+    width:16px; height:16px; background:#0095f6;
+    border-radius:50%; cursor:pointer; border:0;
+  }
+  button{ 
+    padding:6px 12px; background:#0095f6; 
+    color:#fff; border:none; cursor:pointer;
+    font-weight:500;
+  }
+  button:active{ background:#0077cc; }
+  .value-display{
+    font-size:10px; color:#666; 
+    min-width:30px; text-align:right;
+  }
+  .hint{ 
+    font-size:10px; color:#888; 
+    margin-top:4px; display:block;
+  }
 
   .grid{
     display:grid;
     grid-template-columns:repeat(var(--cols), calc(var(--frame-w)*var(--scale)));
     gap:var(--gap);
     justify-content:center;
-    padding:4px;
+    padding:6px;
   }
   .card{
     width:calc(var(--frame-w)*var(--scale));
     border:1px solid #ddd; border-radius:4px; 
     background:#fff; overflow:hidden;
+    box-shadow:0 1px 3px rgba(0,0,0,0.1);
   }
   .meta{
-    font-size:10px; padding:2px 4px; 
+    font-size:10px; padding:3px 5px; 
     border-bottom:1px solid #eee;
     display:flex; justify-content:space-between; 
     align-items:center; line-height:1.3;
+    background:#fafafa;
+  }
+  .meta span{ 
+    overflow:hidden; text-overflow:ellipsis; 
+    white-space:nowrap; flex:1;
   }
   .meta a{ 
     text-decoration:none; color:#0095f6;
     border:1px solid #ddd; border-radius:3px; 
-    padding:1px 4px; font-size:9px; 
+    padding:2px 6px; font-size:9px;
+    margin-left:4px; flex-shrink:0;
   }
-  .meta a:hover{ background:#f0f0f0; }
+  .meta a:active{ background:#f0f0f0; }
   .scale-wrap{
     width:calc(var(--frame-w)*var(--scale));
     height:calc(var(--frame-h)*var(--scale));
     overflow:hidden; position:relative;
+    background:#fff;
   }
   .scale-inner{
     width:var(--frame-w); height:var(--frame-h);
     transform:scale(var(--scale)); transform-origin:top left;
   }
-  iframe{ width:100%; height:100%; border:0; display:block; }
+  iframe{ 
+    width:100%; height:100%; border:0; display:block;
+    background:#fff;
+  }
 
+  /* タブレット・PC用 */
+  @media (min-width: 769px){
+    .menu-toggle{ display:none; }
+    .controls{ display:flex !important; }
+    .header-main{ margin-bottom:0; }
+    header{ 
+      display:flex; justify-content:space-between; 
+      align-items:center; padding:6px 12px;
+    }
+  }
+
+  /* レスポンシブ列数 */
   @media (max-width: 2000px){ :root{ --cols:7; } }
   @media (max-width: 1700px){ :root{ --cols:6; } }
   @media (max-width: 1400px){ :root{ --cols:5; } }
   @media (max-width: 1100px){ :root{ --cols:4; } }
   @media (max-width: 900px) { :root{ --cols:3; } }
   @media (max-width: 650px) { :root{ --cols:2; } }
-  @media (max-width: 450px) { :root{ --cols:1; } }
+  @media (max-width: 450px) { 
+    :root{ --cols:1; --scale:0.88; --gap:8px; }
+    .card{ box-shadow:0 2px 8px rgba(0,0,0,0.1); }
+    .grid{ padding:8px; }
+  }
+
+  /* スマホ横向き */
+  @media (max-width: 900px) and (orientation: landscape){
+    :root{ --cols:3; }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <div style="display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-    <span class="title">Instagram 一括モニター ×18</span>
-    <span class="hint">余白は「高さ」で調整</span>
+  <div class="header-main">
+    <span class="title">📱 Instagram モニター ×18</span>
+    <button class="menu-toggle" onclick="toggleMenu()">⚙️ 設定</button>
   </div>
-  <div class="controls">
-    <label>密度
+  <div class="controls" id="controls">
+    <div class="control-group">
+      <label>列</label>
       <select id="densitySelect">
-        <option value="4">快適（4列）</option>
-        <option value="5">標準（5列）</option>
-        <option value="6" selected>コンパクト（6列）</option>
-        <option value="7">超密（7列）</option>
-        <option value="8">最大（8列）</option>
+        <option value="4">4列</option>
+        <option value="5">5列</option>
+        <option value="6" selected>6列</option>
+        <option value="7">7列</option>
+        <option value="8">8列</option>
       </select>
-    </label>
-    <label>高さ
+    </div>
+    <div class="control-group">
+      <label>高さ</label>
       <input id="heightRange" type="range" min="300" max="500" step="10" value="500" />
-      <span id="heightDisplay" style="font-size:10px;color:#666;">500</span>
-    </label>
-    <label>更新
+      <span id="heightDisplay" class="value-display">500</span>
+    </div>
+    <div class="control-group">
+      <label>更新</label>
       <select id="intervalSelect">
         <option value="0">OFF</option>
         <option value="300000">5分</option>
         <option value="600000" selected>10分</option>
         <option value="900000">15分</option>
       </select>
-    </label>
-    <button id="refreshBtn">🔄</button>
+    </div>
+    <button id="refreshBtn">🔄 更新</button>
+    <span class="hint">💡 1列表示の時は左右スワイプで切替可能</span>
   </div>
 </header>
 
@@ -132,6 +219,11 @@ const heightRange = document.getElementById("heightRange");
 const heightDisplay = document.getElementById("heightDisplay");
 const intervalSelect = document.getElementById("intervalSelect");
 const refreshBtn = document.getElementById("refreshBtn");
+const controls = document.getElementById("controls");
+
+function toggleMenu(){
+  controls.classList.toggle("show");
+}
 
 function createCard(name){
   const card = document.createElement("div");
@@ -174,6 +266,11 @@ function applyDensity(cols){
   r.setProperty("--cols", cols);
   r.setProperty("--frame-w", s.w + "px");
   r.setProperty("--scale", s.scale);
+  
+  // スマホで1列の場合、scaleを大きくして見やすく
+  if(window.innerWidth <= 450 && cols == 1){
+    r.setProperty("--scale", "0.88");
+  }
 }
 
 function applyHeight(px){
@@ -198,6 +295,31 @@ function refreshIframes(){
   });
 }
 
+// スマホでスワイプナビゲーション（1列表示時）
+let touchStartX = 0;
+let touchEndX = 0;
+document.addEventListener('touchstart', e => {
+  touchStartX = e.changedTouches[0].screenX;
+});
+document.addEventListener('touchend', e => {
+  touchEndX = e.changedTouches[0].screenX;
+  handleSwipe();
+});
+function handleSwipe(){
+  const cols = Number(getComputedStyle(document.documentElement).getPropertyValue('--cols'));
+  if(cols !== 1) return;
+  
+  const diff = touchStartX - touchEndX;
+  if(Math.abs(diff) > 50){
+    // スワイプでスクロール（簡易実装）
+    if(diff > 0){
+      window.scrollBy({top: 300, behavior: 'smooth'});
+    } else {
+      window.scrollBy({top: -300, behavior: 'smooth'});
+    }
+  }
+}
+
 render();
 applyDensity(Number(densitySelect.value));
 
@@ -215,6 +337,11 @@ densitySelect.onchange = e => applyDensity(Number(e.target.value));
 heightRange.oninput = e => applyHeight(Number(e.target.value));
 intervalSelect.onchange = e => setAutoRefresh(e.target.value);
 refreshBtn.onclick = () => refreshIframes();
+
+// ウィンドウリサイズ時に再調整
+window.addEventListener('resize', () => {
+  applyDensity(Number(densitySelect.value));
+});
 </script>
 
 </body>
