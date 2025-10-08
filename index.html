@@ -8,17 +8,18 @@
 <title>Instagram 一括モニター ×18</title>
 <style>
   :root{
-    --frame-w: 360px;
+    --frame-w: 300px;
     --frame-h: 500px;
-    --scale: 0.62;
-    --cols: 6;
-    --gap: 6px;
+    --scale: 0.50;
+    --cols: 8;
+    --gap: 8px;
   }
   *{ box-sizing:border-box; margin:0; padding:0; }
   body{
     margin:0; background:#fafafa;
     font-family:"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
     -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
   }
   header{
     position:sticky; top:0; z-index:2;
@@ -94,8 +95,9 @@
     grid-template-columns:repeat(var(--cols), calc(var(--frame-w)*var(--scale)));
     gap:var(--gap);
     justify-content:center;
-    padding:10px 20px;
-    max-width:100%;
+    padding:15px;
+    width:fit-content;
+    max-width:calc(100% - 30px);
     margin:0 auto;
   }
   .card{
@@ -146,39 +148,57 @@
       display:flex; justify-content:space-between; 
       align-items:center; padding:8px 20px;
     }
-    .grid{
-      padding:15px 20px;
-    }
   }
 
-  /* レスポンシブ列数 */
-  @media (min-width: 2001px){ :root{ --cols:8; } }
-  @media (min-width: 1701px) and (max-width: 2000px){ :root{ --cols:7; } }
-  @media (min-width: 1401px) and (max-width: 1700px){ :root{ --cols:6; } }
-  @media (min-width: 1101px) and (max-width: 1400px){ :root{ --cols:5; } }
-  @media (min-width: 901px) and (max-width: 1100px){ :root{ --cols:4; } }
-  @media (min-width: 651px) and (max-width: 900px) { :root{ --cols:3; } }
-  @media (min-width: 451px) and (max-width: 650px) { :root{ --cols:2; } }
+  /* シンプル＆確実なレスポンシブ設定 */
   
+  /* PC大 (1401px以上) */
+  @media (min-width: 1401px){ 
+    :root{ --cols:8; --frame-w:300px; --scale:0.50; --gap:8px; }
+  }
+  
+  /* PC中・ノートPC (1101-1400px) */
+  @media (min-width: 1101px) and (max-width: 1400px){ 
+    :root{ --cols:5; --frame-w:360px; --scale:0.68; --gap:8px; }
+  }
+  
+  /* タブレット横・PC小 (901-1100px) */
+  @media (min-width: 901px) and (max-width: 1100px){ 
+    :root{ --cols:4; --frame-w:360px; --scale:0.68; --gap:8px; }
+  }
+  
+  /* タブレット縦 (651-900px) */
+  @media (min-width: 651px) and (max-width: 900px) { 
+    :root{ --cols:3; --frame-w:360px; --scale:0.68; --gap:8px; }
+  }
+  
+  /* スマホ横・縦大 (451-650px) */
+  @media (min-width: 451px) and (max-width: 650px) { 
+    :root{ --cols:2; --frame-w:360px; --scale:0.68; --gap:8px; }
+  }
+  
+  /* スマホ縦 (450px以下) - 完全最適化 */
   @media (max-width: 450px) { 
-    :root{ --cols:1; --gap:10px; }
+    :root{ --cols:1; --gap:12px; }
     body{ overflow-x:hidden; }
     .grid{ 
-      padding:10px !important;
+      padding:12px !important;
       display:flex !important;
       flex-direction:column;
       align-items:stretch;
       width:100%;
+      max-width:100%;
     }
     .card{ 
-      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      box-shadow:0 2px 8px rgba(0,0,0,0.12);
       width:100% !important;
       max-width:100%;
+      border-radius:8px;
     }
     .scale-wrap{
       width:100% !important;
       height:0 !important;
-      padding-bottom:140% !important;
+      padding-bottom:138.89% !important;
       position:relative !important;
     }
     .scale-inner{
@@ -196,14 +216,16 @@
       top:0;
       left:0;
     }
+    .meta{
+      font-size:11px;
+      padding:5px 8px;
+    }
+    .hint{ display:inline; }
   }
 
-  /* スマホ横向き */
+  /* スマホ横向き - シンプル対応 */
   @media (max-width: 900px) and (orientation: landscape){
-    :root{ --cols:4; }
-  }
-  @media (max-width: 650px) and (orientation: landscape){
-    :root{ --cols:3; }
+    :root{ --cols:3; --frame-w:360px; --scale:0.58; --gap:6px; }
   }
 </style>
 </head>
@@ -220,9 +242,7 @@
       <select id="densitySelect">
         <option value="4">4列</option>
         <option value="5">5列</option>
-        <option value="6" selected>6列</option>
-        <option value="7">7列</option>
-        <option value="8">8列</option>
+        <option value="8" selected>8列</option>
       </select>
     </div>
     <div class="control-group">
@@ -240,7 +260,7 @@
       </select>
     </div>
     <button id="refreshBtn">🔄 更新</button>
-    <span class="hint">💡 1列表示の時は左右スワイプで切替可能</span>
+    <span class="hint">💡 1列表示の時は上下スワイプで切替可能</span>
   </div>
 </header>
 
@@ -274,7 +294,7 @@ function createCard(name){
   const meta = document.createElement("div");
   meta.className = "meta";
   meta.innerHTML = `<span>@${name}</span>
-    <a href="https://www.instagram.com/${name}/" target="_blank" rel="noopener">開く</a>`;
+    <a href="https://www.instagram.com/${name}/" target="_blank" rel="noopener noreferrer">開く</a>`;
 
   const wrap = document.createElement("div");
   wrap.className = "scale-wrap";
@@ -282,7 +302,9 @@ function createCard(name){
   inner.className = "scale-inner";
   const iframe = document.createElement("iframe");
   iframe.loading = "lazy";
-  iframe.src = `https://www.instagram.com/${name}/embed`;
+  iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox";
+  iframe.dataset.src = `https://www.instagram.com/${name}/embed`;
+  iframe.title = `Instagram profile: ${name}`;
 
   inner.appendChild(iframe);
   wrap.appendChild(inner);
@@ -293,18 +315,36 @@ function createCard(name){
 function render(){
   grid.innerHTML = "";
   usernames.forEach(u => grid.appendChild(createCard(u)));
+  
+  // Intersection Observer で遅延読み込み
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if(entry.isIntersecting){
+        const iframe = entry.target;
+        if(iframe.dataset.src && !iframe.src){
+          iframe.src = iframe.dataset.src;
+          observer.unobserve(iframe);
+        }
+      }
+    });
+  }, {
+    rootMargin: '100px'
+  });
+
+  document.querySelectorAll('iframe').forEach(iframe => {
+    observer.observe(iframe);
+  });
 }
 
 function applyDensity(cols){
   const r = document.documentElement.style;
   const settings = {
-    4: { w: 380, scale: 0.75 },
+    4: { w: 360, scale: 0.68 },
     5: { w: 360, scale: 0.68 },
-    6: { w: 340, scale: 0.62 },
-    7: { w: 320, scale: 0.56 },
     8: { w: 300, scale: 0.50 }
   };
-  const s = settings[cols] || settings[6];
+  
+  const s = settings[cols] || settings[8];
   r.setProperty("--cols", cols);
   r.setProperty("--frame-w", s.w + "px");
   r.setProperty("--scale", s.scale);
@@ -313,7 +353,11 @@ function applyDensity(cols){
 function applyHeight(px){
   document.documentElement.style.setProperty("--frame-h", px + "px");
   heightDisplay.textContent = px;
-  localStorage.setItem("ig_dashboard_frame_h", String(px));
+  try {
+    localStorage.setItem("ig_dashboard_frame_h", String(px));
+  } catch(e) {
+    console.warn('localStorage not available:', e);
+  }
 }
 
 let timer = null;
@@ -326,57 +370,91 @@ function setAutoRefresh(ms){
 
 function refreshIframes(){
   document.querySelectorAll("iframe").forEach(f=>{
-    const url = new URL(f.src);
-    url.searchParams.set("_t", Date.now());
-    f.src = url.toString();
+    if(f.src){
+      const originalSrc = f.dataset.src || f.src.split('?')[0];
+      f.src = `${originalSrc}?_t=${Date.now()}`;
+    }
   });
 }
 
 // スマホでスワイプナビゲーション（1列表示時）
 let touchStartX = 0;
 let touchEndX = 0;
+let touchStartY = 0;
+let touchEndY = 0;
+
 document.addEventListener('touchstart', e => {
   touchStartX = e.changedTouches[0].screenX;
-});
+  touchStartY = e.changedTouches[0].screenY;
+}, { passive: true });
+
 document.addEventListener('touchend', e => {
   touchEndX = e.changedTouches[0].screenX;
+  touchEndY = e.changedTouches[0].screenY;
   handleSwipe();
-});
+}, { passive: true });
+
 function handleSwipe(){
   const cols = Number(getComputedStyle(document.documentElement).getPropertyValue('--cols'));
   if(cols !== 1) return;
   
-  const diff = touchStartX - touchEndX;
-  if(Math.abs(diff) > 50){
-    // スワイプでスクロール（簡易実装）
-    if(diff > 0){
-      window.scrollBy({top: 300, behavior: 'smooth'});
+  const diffX = touchStartX - touchEndX;
+  const diffY = touchStartY - touchEndY;
+  
+  // 横スワイプより縦スワイプが大きい場合は通常のスクロール
+  if(Math.abs(diffY) > Math.abs(diffX)) return;
+  
+  if(Math.abs(diffX) > 50){
+    if(diffX > 0){
+      window.scrollBy({top: window.innerHeight * 0.8, behavior: 'smooth'});
     } else {
-      window.scrollBy({top: -300, behavior: 'smooth'});
+      window.scrollBy({top: -window.innerHeight * 0.8, behavior: 'smooth'});
     }
   }
 }
 
+// 初期化
 render();
 applyDensity(Number(densitySelect.value));
 
-const savedH = Number(localStorage.getItem("ig_dashboard_frame_h") || "0");
-if(savedH){ 
+let savedH = 500;
+try {
+  savedH = Number(localStorage.getItem("ig_dashboard_frame_h") || "500");
+} catch(e) {
+  console.warn('localStorage not available:', e);
+}
+
+if(savedH >= 300 && savedH <= 500){ 
   heightRange.value = savedH; 
   applyHeight(savedH); 
 } else { 
-  applyHeight(Number(heightRange.value)); 
+  applyHeight(500); 
 }
 
 setAutoRefresh(intervalSelect.value);
 
-densitySelect.onchange = e => applyDensity(Number(e.target.value));
+// イベントリスナー
+densitySelect.onchange = e => {
+  applyDensity(Number(e.target.value));
+};
+
 heightRange.oninput = e => applyHeight(Number(e.target.value));
+
 intervalSelect.onchange = e => setAutoRefresh(e.target.value);
+
 refreshBtn.onclick = () => refreshIframes();
 
-// ウィンドウリサイズ時に再調整
+// ウィンドウリサイズ時に再調整（デバウンス）
+let resizeTimer;
 window.addEventListener('resize', () => {
+  clearTimeout(resizeTimer);
+  resizeTimer = setTimeout(() => {
+    applyDensity(Number(densitySelect.value));
+  }, 250);
+});
+
+// ページ読み込み完了後の最終調整
+window.addEventListener('load', () => {
   applyDensity(Number(densitySelect.value));
 });
 </script>
