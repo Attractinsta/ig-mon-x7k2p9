@@ -1,462 +1,514 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="mobile-web-app-capable" content="yes" />
-<title>Instagram 一括モニター ×18</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Instagram 一括モニター</title>
 <style>
-  :root{
-    --frame-w: 300px;
-    --frame-h: 500px;
-    --scale: 0.50;
-    --cols: 8;
-    --gap: 8px;
-  }
-  *{ box-sizing:border-box; margin:0; padding:0; }
-  body{
-    margin:0; background:#fafafa;
-    font-family:"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
-    -webkit-font-smoothing:antialiased;
-    overflow-x:hidden;
-  }
-  header{
-    position:sticky; top:0; z-index:2;
-    background:#ffffffee; backdrop-filter:blur(6px);
-    border-bottom:1px solid #ddd; 
-    padding:6px 8px;
-  }
-  .header-main{
-    display:flex; justify-content:space-between; align-items:center;
-    margin-bottom:6px;
-  }
-  .title{ 
-    font-size:14px; font-weight:600;
-    white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
-  }
-  .menu-toggle{
-    background:#f0f0f0; border:1px solid #ccc;
-    padding:4px 10px; border-radius:4px;
-    font-size:12px; cursor:pointer;
-  }
-  .controls{ 
-    display:none;
-    gap:8px; flex-wrap:wrap; 
-    align-items:center; font-size:12px;
-    padding-top:6px; border-top:1px solid #eee;
-  }
-  .controls.show{ display:flex; }
-  .control-group{
-    display:flex; align-items:center; gap:4px;
-    flex:1; min-width:140px;
-  }
-  .control-group label{
-    font-size:11px; white-space:nowrap;
-  }
-  select,button,input[type="range"]{
-    font:inherit; padding:4px 8px; 
-    border:1px solid #ccc; border-radius:4px; 
-    background:#fff; font-size:11px;
-    flex:1;
-  }
-  input[type="range"]{ 
-    min-width:60px;
-    -webkit-appearance:none; appearance:none;
-    height:6px; background:#ddd; outline:none;
-    border-radius:3px;
-  }
-  input[type="range"]::-webkit-slider-thumb{
-    -webkit-appearance:none; appearance:none;
-    width:16px; height:16px; background:#0095f6;
-    border-radius:50%; cursor:pointer;
-  }
-  input[type="range"]::-moz-range-thumb{
-    width:16px; height:16px; background:#0095f6;
-    border-radius:50%; cursor:pointer; border:0;
-  }
-  button{ 
-    padding:6px 12px; background:#0095f6; 
-    color:#fff; border:none; cursor:pointer;
-    font-weight:500;
-  }
-  button:active{ background:#0077cc; }
-  .value-display{
-    font-size:10px; color:#666; 
-    min-width:30px; text-align:right;
-  }
-  .hint{ 
-    font-size:10px; color:#888; 
-    margin-top:4px; display:block;
-  }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 
-  .grid{
-    display:grid;
-    grid-template-columns:repeat(var(--cols), calc(var(--frame-w)*var(--scale)));
-    gap:var(--gap);
-    justify-content:center;
-    padding:15px;
-    width:fit-content;
-    max-width:calc(100% - 30px);
-    margin:0 auto;
-  }
-  .card{
-    width:calc(var(--frame-w)*var(--scale));
-    border:1px solid #ddd; border-radius:4px; 
-    background:#fff; overflow:hidden;
-    box-shadow:0 1px 3px rgba(0,0,0,0.1);
-  }
-  .meta{
-    font-size:10px; padding:3px 5px; 
-    border-bottom:1px solid #eee;
-    display:flex; justify-content:space-between; 
-    align-items:center; line-height:1.3;
-    background:#fafafa;
-  }
-  .meta span{ 
-    overflow:hidden; text-overflow:ellipsis; 
-    white-space:nowrap; flex:1;
-  }
-  .meta a{ 
-    text-decoration:none; color:#0095f6;
-    border:1px solid #ddd; border-radius:3px; 
-    padding:2px 6px; font-size:9px;
-    margin-left:4px; flex-shrink:0;
-  }
-  .meta a:active{ background:#f0f0f0; }
-  .scale-wrap{
-    width:calc(var(--frame-w)*var(--scale));
-    height:calc(var(--frame-h)*var(--scale));
-    overflow:hidden; position:relative;
-    background:#fff;
-  }
-  .scale-inner{
-    width:var(--frame-w); height:var(--frame-h);
-    transform:scale(var(--scale)); transform-origin:top left;
-  }
-  iframe{ 
-    width:100%; height:100%; border:0; display:block;
-    background:#fff;
-  }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans JP", sans-serif;
+  background: #fafafa;
+  color: #262626;
+}
 
-  /* タブレット・PC用 */
-  @media (min-width: 769px){
-    .menu-toggle{ display:none; }
-    .controls{ display:flex !important; }
-    .header-main{ margin-bottom:0; }
-    header{ 
-      display:flex; justify-content:space-between; 
-      align-items:center; padding:8px 20px;
-    }
-  }
+/* ヘッダー */
+header {
+  background: #fff;
+  border-bottom: 1px solid #dbdbdb;
+  padding: 12px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
 
-  /* シンプル＆確実なレスポンシブ設定 */
-  
-  /* PC大 (1401px以上) */
-  @media (min-width: 1401px){ 
-    :root{ --cols:8; --frame-w:300px; --scale:0.50; --gap:8px; }
-  }
-  
-  /* PC中・ノートPC (1101-1400px) */
-  @media (min-width: 1101px) and (max-width: 1400px){ 
-    :root{ --cols:5; --frame-w:360px; --scale:0.68; --gap:8px; }
-  }
-  
-  /* タブレット横・PC小 (901-1100px) */
-  @media (min-width: 901px) and (max-width: 1100px){ 
-    :root{ --cols:4; --frame-w:360px; --scale:0.68; --gap:8px; }
-  }
-  
-  /* タブレット縦 (651-900px) */
-  @media (min-width: 651px) and (max-width: 900px) { 
-    :root{ --cols:3; --frame-w:360px; --scale:0.68; --gap:8px; }
-  }
-  
-  /* スマホ横・縦大 (451-650px) */
-  @media (min-width: 451px) and (max-width: 650px) { 
-    :root{ --cols:2; --frame-w:360px; --scale:0.68; --gap:8px; }
-  }
-  
-  /* スマホ縦 (450px以下) - 完全最適化 */
-  @media (max-width: 450px) { 
-    :root{ --cols:1; --gap:12px; }
-    body{ overflow-x:hidden; }
-    .grid{ 
-      padding:12px !important;
-      display:flex !important;
-      flex-direction:column;
-      align-items:stretch;
-      width:100%;
-      max-width:100%;
-    }
-    .card{ 
-      box-shadow:0 2px 8px rgba(0,0,0,0.12);
-      width:100% !important;
-      max-width:100%;
-      border-radius:8px;
-    }
-    .scale-wrap{
-      width:100% !important;
-      height:0 !important;
-      padding-bottom:138.89% !important;
-      position:relative !important;
-    }
-    .scale-inner{
-      position:absolute !important;
-      top:0 !important;
-      left:0 !important;
-      width:100% !important;
-      height:100% !important;
-      transform:none !important;
-    }
-    iframe{
-      width:100% !important;
-      height:100% !important;
-      position:absolute;
-      top:0;
-      left:0;
-    }
-    .meta{
-      font-size:11px;
-      padding:5px 8px;
-    }
-    .hint{ display:inline; }
-  }
+.header-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
 
-  /* スマホ横向き - シンプル対応 */
-  @media (max-width: 900px) and (orientation: landscape){
-    :root{ --cols:3; --frame-w:360px; --scale:0.58; --gap:6px; }
+h1 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #262626;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.account-count {
+  font-size: 14px;
+  font-weight: 500;
+  color: #8e8e8e;
+  background: #efefef;
+  padding: 2px 8px;
+  border-radius: 12px;
+}
+
+.controls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.control-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.control-item label {
+  font-size: 14px;
+  color: #8e8e8e;
+  white-space: nowrap;
+}
+
+select {
+  padding: 6px 12px;
+  border: 1px solid #dbdbdb;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  outline: none;
+}
+
+select:hover {
+  border-color: #b2b2b2;
+}
+
+button {
+  padding: 6px 16px;
+  background: #0095f6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+button:hover {
+  background: #1877f2;
+}
+
+button:active {
+  background: #0064d8;
+}
+
+/* グリッドコンテナー */
+.grid-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.grid {
+  display: grid;
+  gap: 16px;
+}
+
+/* PC: デフォルト（選択可能） */
+@media (min-width: 1025px) {
+  .grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid.cols-5 { grid-template-columns: repeat(5, 1fr); }
+  .grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
+  .grid.cols-8 { grid-template-columns: repeat(8, 1fr); }
+}
+
+/* タブレット: 2列固定 */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr) !important;
   }
+  
+  .pc-only {
+    display: none;
+  }
+}
+
+/* スマホ: 1列固定 */
+@media (max-width: 640px) {
+  .grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  .pc-only {
+    display: none;
+  }
+  
+  .grid-container {
+    padding: 12px;
+  }
+  
+  .grid {
+    gap: 12px;
+  }
+  
+  h1 {
+    font-size: 16px;
+  }
+  
+  .controls {
+    width: 100%;
+  }
+  
+  .control-item {
+    flex: 1;
+    min-width: 100px;
+  }
+  
+  select {
+    width: 100%;
+  }
+}
+
+/* カード */
+.card {
+  background: #fff;
+  border: 1px solid #dbdbdb;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  transition: box-shadow 0.2s;
+}
+
+.card:hover {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+}
+
+.card-header {
+  padding: 10px 12px;
+  background: #fafafa;
+  border-bottom: 1px solid #efefef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.username {
+  font-size: 13px;
+  font-weight: 600;
+  color: #262626;
+}
+
+.open-link {
+  font-size: 12px;
+  color: #0095f6;
+  text-decoration: none;
+  padding: 4px 10px;
+  border: 1px solid #0095f6;
+  border-radius: 4px;
+  transition: all 0.2s;
+}
+
+.open-link:hover {
+  background: #0095f6;
+  color: #fff;
+}
+
+.iframe-container {
+  width: 100%;
+  position: relative;
+  background: #fff;
+  overflow: hidden;
+  height: 600px;
+}
+
+iframe {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 340px;
+  height: 600px;
+  border: none;
+  transform-origin: top center;
+}
+
+/* 列数に応じてiframeをスケール */
+@media (min-width: 1025px) {
+  .grid.cols-3 iframe { transform: translateX(-50%) scale(1); }
+  .grid.cols-4 iframe { transform: translateX(-50%) scale(0.85); }
+  .grid.cols-5 iframe { transform: translateX(-50%) scale(0.70); }
+  .grid.cols-6 iframe { transform: translateX(-50%) scale(0.58); }
+  .grid.cols-8 iframe { transform: translateX(-50%) scale(0.45); }
+  
+  .grid.cols-3 .iframe-container { height: 600px; }
+  .grid.cols-4 .iframe-container { height: 510px; }
+  .grid.cols-5 .iframe-container { height: 420px; }
+  .grid.cols-6 .iframe-container { height: 350px; }
+  .grid.cols-8 .iframe-container { height: 270px; }
+}
+
+/* タブレット: 2列 */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .iframe-container { height: 550px; }
+  iframe { transform: translateX(-50%) scale(0.90); }
+}
+
+/* スマホ: 1列 */
+@media (max-width: 640px) {
+  .iframe-container { height: 600px; }
+  iframe { 
+    transform: translateX(-50%) scale(1);
+    width: 100%;
+    max-width: 340px;
+  }
+}
+
+/* ローディング状態 */
+.loading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: #8e8e8e;
+  font-size: 14px;
+}
+
+/* スクロールバーのスタイリング */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #fafafa;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #dbdbdb;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b2b2b2;
+}
+
+/* レスポンシブ調整 */
+@media (max-width: 640px) {
+  .card-header {
+    padding: 8px 10px;
+  }
+  
+  .username {
+    font-size: 12px;
+  }
+  
+  .open-link {
+    font-size: 11px;
+    padding: 3px 8px;
+  }
+}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="header-main">
-    <span class="title">📱 Instagram モニター ×18</span>
-    <button class="menu-toggle" onclick="toggleMenu()">⚙️ 設定</button>
-  </div>
-  <div class="controls" id="controls">
-    <div class="control-group">
-      <label>列</label>
-      <select id="densitySelect">
-        <option value="4">4列</option>
-        <option value="5">5列</option>
-        <option value="8" selected>8列</option>
-      </select>
+  <div class="header-content">
+    <h1>
+      📱 Instagram モニター
+      <span class="account-count" id="accountCount">×18</span>
+    </h1>
+    <div class="controls">
+      <div class="control-item pc-only">
+        <label>列数:</label>
+        <select id="colSelect">
+          <option value="3">3列</option>
+          <option value="4" selected>4列</option>
+          <option value="5">5列</option>
+          <option value="6">6列</option>
+          <option value="8">8列</option>
+        </select>
+      </div>
+      <div class="control-item">
+        <label>更新:</label>
+        <select id="refreshSelect">
+          <option value="0">OFF</option>
+          <option value="300000">5分</option>
+          <option value="600000" selected>10分</option>
+          <option value="900000">15分</option>
+        </select>
+      </div>
+      <button id="refreshBtn">🔄 更新</button>
     </div>
-    <div class="control-group">
-      <label>高さ</label>
-      <input id="heightRange" type="range" min="300" max="500" step="10" value="500" />
-      <span id="heightDisplay" class="value-display">500</span>
-    </div>
-    <div class="control-group">
-      <label>更新</label>
-      <select id="intervalSelect">
-        <option value="0">OFF</option>
-        <option value="300000">5分</option>
-        <option value="600000" selected>10分</option>
-        <option value="900000">15分</option>
-      </select>
-    </div>
-    <button id="refreshBtn">🔄 更新</button>
-    <span class="hint">💡 1列表示の時は上下スワイプで切替可能</span>
   </div>
 </header>
 
-<main class="grid" id="grid"></main>
+<div class="grid-container">
+  <div class="grid cols-4" id="grid"></div>
+</div>
 
 <script>
-const usernames = [
-  "okamura_koumuten","karada_4590","mayasound8","yamatosangyo_kyoto",
-  "tamayobi_official","allespetaplus","nagasawa0208","trys_fudosan_hisatoshimada",
-  "villa_amatsuboshi","mist_watasi","pety.official.store","fullbrain2025",
-  "plus.one_osaka","mikataokinawa","GELpress.japan","outdoorchair_lab",
-  "marklis.web.marketing","azzurro_tokyo"
+// ★ アカウントリスト - ここに追加していくだけでOK
+const accounts = [
+  "okamura_koumuten",
+  "karada_4590",
+  "mayasound8",
+  "yamatosangyo_kyoto",
+  "tamayobi_official",
+  "allespetaplus",
+  "nagasawa0208",
+  "trys_fudosan_hisatoshimada",
+  "villa_amatsuboshi",
+  "mist_watasi",
+  "pety.official.store",
+  "fullbrain2025",
+  "plus.one_osaka",
+  "mikataokinawa",
+  "GELpress.japan",
+  "outdoorchair_lab",
+  "marklis.web.marketing",
+  "azzurro_tokyo"
+  // ★ ここに追加で何個でも増やせます
+  // "new_account_1",
+  // "new_account_2",
+  // ...
 ];
 
-const grid = document.getElementById("grid");
-const densitySelect = document.getElementById("densitySelect");
-const heightRange = document.getElementById("heightRange");
-const heightDisplay = document.getElementById("heightDisplay");
-const intervalSelect = document.getElementById("intervalSelect");
-const refreshBtn = document.getElementById("refreshBtn");
-const controls = document.getElementById("controls");
+const grid = document.getElementById('grid');
+const colSelect = document.getElementById('colSelect');
+const refreshSelect = document.getElementById('refreshSelect');
+const refreshBtn = document.getElementById('refreshBtn');
+const accountCount = document.getElementById('accountCount');
 
-function toggleMenu(){
-  controls.classList.toggle("show");
-}
+let refreshTimer = null;
 
-function createCard(name){
-  const card = document.createElement("div");
-  card.className = "card";
+// アカウント数を表示
+accountCount.textContent = `×${accounts.length}`;
 
-  const meta = document.createElement("div");
-  meta.className = "meta";
-  meta.innerHTML = `<span>@${name}</span>
-    <a href="https://www.instagram.com/${name}/" target="_blank" rel="noopener noreferrer">開く</a>`;
-
-  const wrap = document.createElement("div");
-  wrap.className = "scale-wrap";
-  const inner = document.createElement("div");
-  inner.className = "scale-inner";
-  const iframe = document.createElement("iframe");
-  iframe.loading = "lazy";
-  iframe.sandbox = "allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox";
-  iframe.dataset.src = `https://www.instagram.com/${name}/embed`;
-  iframe.title = `Instagram profile: ${name}`;
-
-  inner.appendChild(iframe);
-  wrap.appendChild(inner);
-  card.append(meta, wrap);
+// カード作成（変更なし）
+function createCard(username) {
+  const card = document.createElement('div');
+  card.className = 'card';
+  
+  card.innerHTML = `
+    <div class="card-header">
+      <span class="username">@${username}</span>
+      <a href="https://www.instagram.com/${username}/" target="_blank" rel="noopener noreferrer" class="open-link">開く</a>
+    </div>
+    <div class="iframe-container">
+      <div class="loading">読み込み中...</div>
+      <iframe 
+        data-src="https://www.instagram.com/${username}/embed"
+        title="${username}"
+        loading="lazy"
+        sandbox="allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox">
+      </iframe>
+    </div>
+  `;
+  
   return card;
 }
 
-function render(){
-  grid.innerHTML = "";
-  usernames.forEach(u => grid.appendChild(createCard(u)));
+// グリッド初期化
+function initGrid() {
+  grid.innerHTML = '';
+  accounts.forEach(username => {
+    grid.appendChild(createCard(username));
+  });
   
-  // Intersection Observer で遅延読み込み
+  // Intersection Observerで遅延読み込み
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
-      if(entry.isIntersecting){
+      if (entry.isIntersecting) {
         const iframe = entry.target;
-        if(iframe.dataset.src && !iframe.src){
+        if (iframe.dataset.src && !iframe.src) {
           iframe.src = iframe.dataset.src;
           observer.unobserve(iframe);
         }
       }
     });
   }, {
-    rootMargin: '100px'
+    rootMargin: '200px'
   });
-
+  
   document.querySelectorAll('iframe').forEach(iframe => {
     observer.observe(iframe);
   });
 }
 
-function applyDensity(cols){
-  const r = document.documentElement.style;
-  const settings = {
-    4: { w: 360, scale: 0.68 },
-    5: { w: 360, scale: 0.68 },
-    8: { w: 300, scale: 0.50 }
-  };
-  
-  const s = settings[cols] || settings[8];
-  r.setProperty("--cols", cols);
-  r.setProperty("--frame-w", s.w + "px");
-  r.setProperty("--scale", s.scale);
-}
-
-function applyHeight(px){
-  document.documentElement.style.setProperty("--frame-h", px + "px");
-  heightDisplay.textContent = px;
+// 列数変更
+function updateColumns(cols) {
+  grid.className = `grid cols-${cols}`;
   try {
-    localStorage.setItem("ig_dashboard_frame_h", String(px));
-  } catch(e) {
-    console.warn('localStorage not available:', e);
-  }
+    localStorage.setItem('ig-monitor-cols', cols);
+  } catch(e) {}
 }
 
-let timer = null;
-function setAutoRefresh(ms){
-  if(timer) clearInterval(timer);
-  if(ms && Number(ms)>0){
-    timer = setInterval(()=>refreshIframes(), Number(ms));
+// 自動更新設定
+function setupAutoRefresh(interval) {
+  if (refreshTimer) {
+    clearInterval(refreshTimer);
+    refreshTimer = null;
   }
+  
+  if (interval > 0) {
+    refreshTimer = setInterval(refreshAll, interval);
+  }
+  
+  try {
+    localStorage.setItem('ig-monitor-refresh', interval);
+  } catch(e) {}
 }
 
-function refreshIframes(){
-  document.querySelectorAll("iframe").forEach(f=>{
-    if(f.src){
-      const originalSrc = f.dataset.src || f.src.split('?')[0];
-      f.src = `${originalSrc}?_t=${Date.now()}`;
+// 全iframe更新
+function refreshAll() {
+  document.querySelectorAll('iframe').forEach(iframe => {
+    if (iframe.src) {
+      const url = iframe.dataset.src || iframe.src.split('?')[0];
+      iframe.src = `${url}?t=${Date.now()}`;
     }
   });
 }
 
-// スマホでスワイプナビゲーション（1列表示時）
-let touchStartX = 0;
-let touchEndX = 0;
-let touchStartY = 0;
-let touchEndY = 0;
+// イベントリスナー
+colSelect.addEventListener('change', (e) => {
+  updateColumns(e.target.value);
+});
 
-document.addEventListener('touchstart', e => {
-  touchStartX = e.changedTouches[0].screenX;
-  touchStartY = e.changedTouches[0].screenY;
-}, { passive: true });
+refreshSelect.addEventListener('change', (e) => {
+  setupAutoRefresh(parseInt(e.target.value));
+});
 
-document.addEventListener('touchend', e => {
-  touchEndX = e.changedTouches[0].screenX;
-  touchEndY = e.changedTouches[0].screenY;
-  handleSwipe();
-}, { passive: true });
-
-function handleSwipe(){
-  const cols = Number(getComputedStyle(document.documentElement).getPropertyValue('--cols'));
-  if(cols !== 1) return;
-  
-  const diffX = touchStartX - touchEndX;
-  const diffY = touchStartY - touchEndY;
-  
-  // 横スワイプより縦スワイプが大きい場合は通常のスクロール
-  if(Math.abs(diffY) > Math.abs(diffX)) return;
-  
-  if(Math.abs(diffX) > 50){
-    if(diffX > 0){
-      window.scrollBy({top: window.innerHeight * 0.8, behavior: 'smooth'});
-    } else {
-      window.scrollBy({top: -window.innerHeight * 0.8, behavior: 'smooth'});
-    }
-  }
-}
+refreshBtn.addEventListener('click', refreshAll);
 
 // 初期化
-render();
-applyDensity(Number(densitySelect.value));
+initGrid();
 
-let savedH = 500;
+// 保存された設定を読み込み
 try {
-  savedH = Number(localStorage.getItem("ig_dashboard_frame_h") || "500");
+  const savedCols = localStorage.getItem('ig-monitor-cols');
+  if (savedCols) {
+    colSelect.value = savedCols;
+    updateColumns(savedCols);
+  }
+  
+  const savedRefresh = localStorage.getItem('ig-monitor-refresh');
+  if (savedRefresh) {
+    refreshSelect.value = savedRefresh;
+    setupAutoRefresh(parseInt(savedRefresh));
+  } else {
+    setupAutoRefresh(600000); // デフォルト10分
+  }
 } catch(e) {
-  console.warn('localStorage not available:', e);
+  setupAutoRefresh(600000);
 }
-
-if(savedH >= 300 && savedH <= 500){ 
-  heightRange.value = savedH; 
-  applyHeight(savedH); 
-} else { 
-  applyHeight(500); 
-}
-
-setAutoRefresh(intervalSelect.value);
-
-// イベントリスナー
-densitySelect.onchange = e => {
-  applyDensity(Number(e.target.value));
-};
-
-heightRange.oninput = e => applyHeight(Number(e.target.value));
-
-intervalSelect.onchange = e => setAutoRefresh(e.target.value);
-
-refreshBtn.onclick = () => refreshIframes();
-
-// ウィンドウリサイズ時に再調整（デバウンス）
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    applyDensity(Number(densitySelect.value));
-  }, 250);
-});
-
-// ページ読み込み完了後の最終調整
-window.addEventListener('load', () => {
-  applyDensity(Number(densitySelect.value));
-});
 </script>
 
 </body>
