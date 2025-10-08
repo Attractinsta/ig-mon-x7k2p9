@@ -147,41 +147,57 @@
   }
 
   /* レスポンシブ列数 */
-  @media (max-width: 2000px){ :root{ --cols:7; } }
-  @media (max-width: 1700px){ :root{ --cols:6; } }
-  @media (max-width: 1400px){ :root{ --cols:5; } }
-  @media (max-width: 1100px){ :root{ --cols:4; } }
-  @media (max-width: 900px) { :root{ --cols:3; } }
-  @media (max-width: 650px) { :root{ --cols:2; } }
+  @media (min-width: 2001px){ :root{ --cols:8; } }
+  @media (min-width: 1701px) and (max-width: 2000px){ :root{ --cols:7; } }
+  @media (min-width: 1401px) and (max-width: 1700px){ :root{ --cols:6; } }
+  @media (min-width: 1101px) and (max-width: 1400px){ :root{ --cols:5; } }
+  @media (min-width: 901px) and (max-width: 1100px){ :root{ --cols:4; } }
+  @media (min-width: 651px) and (max-width: 900px) { :root{ --cols:3; } }
+  @media (min-width: 451px) and (max-width: 650px) { :root{ --cols:2; } }
+  
   @media (max-width: 450px) { 
-    :root{ --cols:1; --gap:8px; }
+    :root{ --cols:1; --gap:10px; }
+    body{ overflow-x:hidden; }
+    .grid{ 
+      padding:10px;
+      display:flex !important;
+      flex-direction:column;
+      align-items:stretch;
+      width:100%;
+    }
     .card{ 
       box-shadow:0 2px 8px rgba(0,0,0,0.1);
       width:100% !important;
-    }
-    .grid{ 
-      padding:8px;
-      grid-template-columns:1fr !important;
+      max-width:100%;
     }
     .scale-wrap{
       width:100% !important;
-      height:auto !important;
-      aspect-ratio: 360 / 500;
+      height:0 !important;
+      padding-bottom:140% !important;
+      position:relative !important;
     }
     .scale-inner{
+      position:absolute !important;
+      top:0 !important;
+      left:0 !important;
       width:100% !important;
-      height:auto !important;
+      height:100% !important;
       transform:none !important;
-      aspect-ratio: 360 / 500;
     }
     iframe{
       width:100% !important;
       height:100% !important;
+      position:absolute;
+      top:0;
+      left:0;
     }
   }
 
   /* スマホ横向き */
   @media (max-width: 900px) and (orientation: landscape){
+    :root{ --cols:4; }
+  }
+  @media (max-width: 650px) and (orientation: landscape){
     :root{ --cols:3; }
   }
 </style>
