@@ -154,9 +154,30 @@
   @media (max-width: 900px) { :root{ --cols:3; } }
   @media (max-width: 650px) { :root{ --cols:2; } }
   @media (max-width: 450px) { 
-    :root{ --cols:1; --scale:0.88; --gap:8px; }
-    .card{ box-shadow:0 2px 8px rgba(0,0,0,0.1); }
-    .grid{ padding:8px; }
+    :root{ --cols:1; --gap:8px; }
+    .card{ 
+      box-shadow:0 2px 8px rgba(0,0,0,0.1);
+      width:100% !important;
+    }
+    .grid{ 
+      padding:8px;
+      grid-template-columns:1fr !important;
+    }
+    .scale-wrap{
+      width:100% !important;
+      height:auto !important;
+      aspect-ratio: 360 / 500;
+    }
+    .scale-inner{
+      width:100% !important;
+      height:auto !important;
+      transform:none !important;
+      aspect-ratio: 360 / 500;
+    }
+    iframe{
+      width:100% !important;
+      height:100% !important;
+    }
   }
 
   /* スマホ横向き */
@@ -266,11 +287,6 @@ function applyDensity(cols){
   r.setProperty("--cols", cols);
   r.setProperty("--frame-w", s.w + "px");
   r.setProperty("--scale", s.scale);
-  
-  // スマホで1列の場合、scaleを大きくして見やすく
-  if(window.innerWidth <= 450 && cols == 1){
-    r.setProperty("--scale", "0.88");
-  }
 }
 
 function applyHeight(px){
